@@ -10,3 +10,5 @@ paras = {}
 methods = ['mean1d', 'mean2d', 'FaLRTC']
 for method in methods:
     print ct.CompleteTensor(X1, method, paras)
+    
+ct.CompleteTensor(X1, 'whatever', paras)

@@ -33,7 +33,7 @@ def CompleteTensor(T, method, paras):
 
     func = switcher.get(method, "Unexpected method")    
     if func == 'Unexpected method':
-        print func
+        raise NameError('Unexpected method')
     else:
         start = time.clock()  
         
