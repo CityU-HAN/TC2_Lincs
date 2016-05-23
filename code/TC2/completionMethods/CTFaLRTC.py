@@ -14,10 +14,10 @@ Log:
 
 
 import tensorflow as tf
-import numpy as np
+#import numpy as np
 
 
-class CTFaLRTC:
+class FaLRTC:
     """
     Input:
         T: Input tensor
@@ -26,11 +26,15 @@ class CTFaLRTC:
         T_model: completed tensor
     
     """
-    def __init__(self):
+    def __init__(self, T, paras):
+        self.T = tf.convert_to_tensor(T, dtype = 'float32')
+        self.paras = paras
         
         
-    def fit(self, T, paras):
+    def _run(self, sess):
         # Fake output = all zero tensor with the same shape as input
-        T2 = tf.convert_to_tensor(T, dtype = 'float32')
-        T_model = tf.zeros([i for i in T2._shape])
+        self.T_model = tf.zeros([i for i in self.T._shape])
+        sess.run(tf.initialize_all_variables())
+        
+        T_model = sess.run(self.T_model)
         return T_model

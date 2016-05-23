@@ -11,9 +11,9 @@ Log:
     2016-05-22 JL: Program first created
 """
 import tensorflow as tf
-import numpy as np
+#import numpy as np
 
-class CTMean:
+class MeanTC:
     """
     Input:
         T: Input tensor
@@ -22,17 +22,23 @@ class CTMean:
         T_model: completed tensor
     
     """
-    def __init__(self):
+    def __init__(self, T, paras):
+        self.T = tf.convert_to_tensor(T, dtype = 'float32')
+        self.paras = paras
         
         
-    def Mean1D(self, T, paras):
-        # Fake output = all zero tensor with the same shape as input
-        T2 = tf.convert_to_tensor(T, dtype = 'float32')
-        T_model = tf.ones([i for i in T2._shape])
+    def _run1D(self, sess):
+        # Fake output = all 1 tensor with the same shape as input
+        self.T_model = tf.ones([i for i in self.T._shape])
+        sess.run(tf.initialize_all_variables())
+        
+        T_model = sess.run(self.T_model)
         return T_model
         
-    def Mean2D(self, T, paras):
-        # Fake output = all zero tensor with the same shape as input
-        T2 = tf.convert_to_tensor(T, dtype = 'float32')
-        T_model = tf.constant(2, shape = [i for i in T2._shape])
+    def _run2D(self, sess):
+        # Fake output = all 2 tensor with the same shape as input
+        self.T_model = tf.constant(2, shape = [i for i in self.T._shape])
+        sess.run(tf.initialize_all_variables())
+
+        T_model = sess.run(self.T_model)
         return T_model
