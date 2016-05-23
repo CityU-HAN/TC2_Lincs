@@ -41,6 +41,6 @@ def CompleteTensor(T, method, paras):
         T_model = func(sess)
         
         end = time.clock()
-        runtime = start - end
+        runtime = end - start
         return (T_model, runtime)
 
