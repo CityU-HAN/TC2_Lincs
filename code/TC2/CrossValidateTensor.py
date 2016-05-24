@@ -92,9 +92,10 @@ class CV_CompleteTensor:
             T_out = self.onePass(idx_removed)
             T_CV[idx_removed] = T_out[idx_removed]
             
-            i = i + 1
             if i%100 == 0:
                 print 'Fold count: ' + str(i+1)
+            
+            i = i + 1
         
         idx_miss = np.isnan(self.T) # Force T_CV to have the same missing pattern as input
         T_CV[idx_miss] = 'nan'        
