@@ -2,6 +2,9 @@
 Project: TC2
 Description: Methods to compute imputation error 
 
+Note: 
+    1. npPCT: pct = 0 if no pairwise completed obs, or no variance
+
 To-do:
 
 Author: Jingshu Liu
@@ -9,7 +12,7 @@ Log:
     2016-05-22 JL: Program first created
   
 Input:
-    X, Y: numpy arrays
+    X, Y: numpy arrays with the same dimensions
     
 Output: 
     errorStat
@@ -35,3 +38,24 @@ def npL2Error(X, Y):
     l2error = np.nanmean(dif**2)
     return l2error
     
+def npPCT(X, Y, dimType):
+    """
+    Compute the pearson correlation, treating the inputs as two vectors
+    Input: 
+        dimType: ['all', 'd', 'g', 'c']
+    
+    """
+    X2 = X.flatten()
+    Y2 = Y.flatten()
+    data = [X2, Y2]
+    maskedarr = np.ma.array(data, mask=np.isnan(data))
+    pct = np.ma.corrcoef(maskedarr).data[0,1] # pct = 0 if no pairwise completed obs, or no variance
+    return pct
+    
+def npGCP(X, Y):
+    gcp = 0
+    return gcp
+    
+def npAUC(X, Y):
+    gcp = 0
+    return gcp
