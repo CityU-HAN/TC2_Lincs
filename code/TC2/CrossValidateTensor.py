@@ -1,6 +1,6 @@
 """
 Project: TC2
-Description: Compute imputation error by cross validation
+Description: Imputate tensor by cross validation
 
 Note: 
     1. Assume the dimension of the data is always [drug, gene, cell]
@@ -40,8 +40,7 @@ class CV_CompleteTensor:
         self.CVType = CVType
         self.TCmethod = TCmethod
         self.paras = paras
-        
-        
+                
     def _run(self, T, kfold = 1):
         self.T = T.astype('float')
         folds = {
@@ -63,14 +62,11 @@ class CV_CompleteTensor:
         if func == 'Unexpected method':
             raise NameError('Unexpected method')
         else:
-            start = time.clock()  
-            
-            T_CV = func()
-            
+            start = time.clock()              
+            T_CV = func()            
             end = time.clock()
-            runtime = (end - start)*1.0/self.kfold
-            return T_CV, runtime
-
+            timePerFold = (end - start)*1.0/self.kfold
+            return T_CV, timePerFold
     
     def _splitKfold(self, k):
         """
@@ -89,22 +85,18 @@ class CV_CompleteTensor:
             lsSplit.append([valMin, valMax])
         return lsSplit
          
-
-      
+         
     def onePass(self, idx_removed):
         T_input = copy.copy(self.T)
-        T_input[idx_removed] = 'nan'
-        
+        T_input[idx_removed] = 'nan'        
         T_out, runtime = ct.CompleteTensor(T_input, self.TCmethod, self.paras)
         return T_out
         
-
     def CV_fLOO(self):
         """
         Leave-one-out CV by fiber
         """
         T_CV = np.empty(self.T.shape) # Initiate output tensor
-
         lsCombo = [[i,k] for i in range(0, self.T.shape[0]) for k in range(0, self.T.shape[2])]
         
         i = 0
@@ -115,8 +107,7 @@ class CV_CompleteTensor:
             T_CV[idx_removed] = T_out[idx_removed]
             
             if i%100 == 0:
-                print 'Fold count: ' + str(i+1)
-            
+                print 'Fold count: ' + str(i+1)            
             i = i + 1
                         
         idx_miss = np.isnan(self.T) # Force T_CV to have the same missing pattern as input

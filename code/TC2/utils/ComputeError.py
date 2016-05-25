@@ -12,7 +12,7 @@ Log:
     2016-05-22 JL: Program first created
   
 Input:
-    X, Y: numpy arrays with the same dimensions
+    X, Y: numpy arrays with the same dimensions, except for otherwise specified
     
 Output: 
     errorStat
@@ -20,6 +20,8 @@ Output:
 
 import tensorflow as tf
 import numpy as np
+
+import TC2.utils.MatrixTransform as mt
 
 def tfL2Error(X, Y):    
     X2 = tf.convert_to_tensor(X, dtype = 'float32')
@@ -38,24 +40,64 @@ def npL2Error(X, Y):
     l2error = np.nanmean(dif**2)
     return l2error
     
-def npPCT(X, Y, dimType):
+def npPCT(X, Y):
     """
-    Compute the pearson correlation, treating the inputs as two vectors
-    Input: 
-        dimType: ['all', 'd', 'g', 'c']
-    
+    Compute the pearson correlation, treating the inputs as two vectors    
     """
     X2 = X.flatten()
     Y2 = Y.flatten()
     data = [X2, Y2]
     maskedarr = np.ma.array(data, mask=np.isnan(data))
-    pct = np.ma.corrcoef(maskedarr).data[0,1] # pct = 0 if no pairwise completed obs, or no variance
-    return pct
+    pct = np.ma.corrcoef(maskedarr) # pct = 0 if no pairwise completed obs, or no variance
+    pct_data = pct.data
+    pct_data[pct.mask] = np.nan # make masked value to be missing
+    return pct_data[0,1]
+
+def npPCT_allMode(X, Y):
+    """
+    Compute the pearson correlation of different modes. E.g., for the same drug, the correlation between true and imputed (gene X cell)   
+    Output:
+        lsPCTd, lsPCTg, lsPCTc: list of PCT of the corresponding mode
+    """
+    dlen, glen, clen = X.shape
+    lsPCTd = [npPCT(X[i,:,:], Y[i,:,:]) for i in range(0, dlen)]
+    lsPCTg = [npPCT(X[:,i,:], Y[:,i,:]) for i in range(0, glen)]
+    lsPCTc = [npPCT(X[:,:,i], Y[:,:,i]) for i in range(0, clen)]
     
-def npGCP(X, Y):
-    gcp = 0
-    return gcp
+    return lsPCTd, lsPCTg, lsPCTc
+
+def npGCP(Xm, Ym):
+    """
+    1. For one cell, compute the gene correlation matrix
+    2. Evaluate cell-specific gene correlation preservation by the PCT of the correlation matrices
+    Input: 
+        Xm, Ym: two matrices with shape as drug X gene
+    Output:
+        GCP: Gene correlation preservation measure
+    """
+    vt_corMatX = mt.np_matCorToVector(Xm, rowvar = False)
+    vt_corMatY = mt.np_matCorToVector(Ym, rowvar = False)
     
-def npAUC(X, Y):
-    gcp = 0
-    return gcp
+    GCP = npPCT(vt_corMatX, vt_corMatY)
+    return GCP
+        
+def npGCP_allCell(X, Y):
+    """
+    Output:
+        lsGCPc: list of GCP for each cell type
+    """
+    dlen, glen, clen = X.shape
+    lsGCPc = [npGCP(X[:,:,i], Y[:,:,i]) for i in range(0, clen)]
+    return lsGCPc
+    
+def npAUC(X, Y, topQuantile = 0.01):
+    """
+    Rank gene expression in each drug+cell profile, compare the association with true rank.
+    True rank is denoted by 0/+-1, where +1 means value >= top quantile (abs), while -1 means value <= -top quantile (abs)
+    """
+    """ HERE ===
+    X.apply(rank)
+    abs(Y.apply(mt.np_quantileTo01(Xv, topQuantile)))
+    AUC = auc(X, Y)
+    return AUC
+    """"
