@@ -53,6 +53,15 @@ def np_quantileTo01(Xv, top_quantile = 0.01):
     Xv_out[Xv <= -quantile] = -1
     return Xv_out
     
+def np_pairFlatRmNA(X, Y):
+    """
+    Flatten X, Y, and remove any pair that isn't complete
+    """    
+    X2 = X.flatten()
+    Y2 = Y.flatten()
     
+    X3 = X2[(~np.isnan(X2)) & (~np.isnan(Y2))]
+    Y3 = Y2[(~np.isnan(X2)) & (~np.isnan(Y2))]
+    return X3, Y3
     
     

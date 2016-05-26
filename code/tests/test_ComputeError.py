@@ -25,6 +25,7 @@ print ce.npPCT_mode(X4, X5)
 X4[0,:,:] = np.nan
 X4[1,1,1] = np.nan
 print ce.npPCT_mode(X4, X5)
+print ce.npAUC(X4, X5)
 
 X6 = np.random.uniform(size = 24).reshape([4,3,2])
 X6[:,1,1] = np.nan

@@ -4,6 +4,7 @@ Description: Methods to compute imputation error
 
 Note: 
     1. npPCT: pct = 0 if no pairwise completed obs, or no variance
+    2. npAUC: nans are ranked at bottom
 
 To-do:
 
@@ -20,6 +21,8 @@ Output:
 
 import tensorflow as tf
 import numpy as np
+from scipy.stats import rankdata
+from sklearn import metrics
 
 import TC2.utils.MatrixTransform as mt
 
@@ -95,9 +98,14 @@ def npAUC(X, Y, topQuantile = 0.01):
     Rank gene expression in each drug+cell profile, compare the association with true rank.
     True rank is denoted by 0/+-1, where +1 means value >= top quantile (abs), while -1 means value <= -top quantile (abs)
     """
-    """ HERE ===
-    X.apply(rank)
-    abs(Y.apply(mt.np_quantileTo01(Xv, topQuantile)))
-    AUC = auc(X, Y)
+    XFill = np.abs(X)
+    XFill[np.isnan(X)] = 0 # Fill nan as 0 so that they are ranked at the bottom
+    XRank = np.apply_along_axis(rankdata, 1, XFill) 
+    XRank[np.isnan(X)] = np.nan # put the ranking of nans to nan
+    
+    YRank = np.abs(np.apply_along_axis(lambda y: mt.np_quantileTo01(y, topQuantile), 1, Y)) 
+
+    XRank_rmNan, YRank_rmNan = mt.np_pairFlatRmNA(XRank, YRank)
+    AUC = metrics.roc_auc_score(YRank_rmNan, XRank_rmNan)
     return AUC
-    """"
+  
