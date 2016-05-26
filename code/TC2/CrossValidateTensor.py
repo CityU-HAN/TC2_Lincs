@@ -8,8 +8,10 @@ Note:
     3. For CV on slices, consider all combinations
 
 To-do:
-    1. Enable remove slice 
-    2. Add parallel methods
+    1. Add random seed to paras
+    2. Enable remove slice 
+    3. Add parallel methods
+    
 
 Author: Jingshu Liu
 Log: 
@@ -20,7 +22,7 @@ import time
 import copy
 import numpy as np
 from TC2 import CompleteTensor as ct
-#import pdb
+import pdb
 
 class CV_CompleteTensor:
     """
@@ -90,20 +92,24 @@ class CV_CompleteTensor:
         T_input = copy.copy(self.T)
         T_input[idx_removed] = 'nan'        
         T_out, runtime = ct.CompleteTensor(T_input, self.TCmethod, self.paras)
+        pdb.set_trace()
         return T_out
         
     def CV_fLOO(self):
         """
         Leave-one-out CV by fiber
         """
-        T_CV = np.empty(self.T.shape) # Initiate output tensor
-        lsCombo = [[i,k] for i in range(0, self.T.shape[0]) for k in range(0, self.T.shape[2])]
+        dlen, glen, clen = self.T.shape
+        
+        T_CV = np.empty((dlen, glen, clen)) # Initiate output tensor
+        lsCombo = [[i,k] for i in range(0, dlen) for k in range(0, clen)]
         
         i = 0
         for combo in lsCombo:
-            idx_removed = np.full(self.T.shape, False, dtype=bool) # Initiate index tensor
+            idx_removed = np.full((dlen, glen, clen), False, dtype=bool) # Initiate index tensor
             idx_removed[combo[0], : , combo[1]] = True
             T_out = self.onePass(idx_removed)
+            pdb.set_trace()
             T_CV[idx_removed] = T_out[idx_removed]
             
             if i%100 == 0:
