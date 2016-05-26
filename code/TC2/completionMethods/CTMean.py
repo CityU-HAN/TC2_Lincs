@@ -6,7 +6,6 @@ Note:
     1. Default alpha for 2D-mean is 0.5
     2. Clarify - current 2D-mean will be nan if one of the component is nan
 To-do:
-    1. Replace the placeholder script with the real method
 
 Author: Jingshu Liu
 Log: 
