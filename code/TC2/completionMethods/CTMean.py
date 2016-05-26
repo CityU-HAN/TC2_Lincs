@@ -52,7 +52,7 @@ class MeanTC:
         mtMeanc = np.nanmean(self.T, axis = 2) # Get drug-gene specific mean
         T_Meanc = mtMeanc.reshape(self.dlen, self.glen, 1).repeat(self.clen, 2)
 
-        mtMeand = np.nanmean(self.T, axis = 0) # Get drug-gene specific mean   
+        mtMeand = np.nanmean(self.T, axis = 0) # Get cell-gene specific mean   
         T_Meand = mtMeand.reshape(1, self.glen, self.clen).repeat(self.dlen, 0) 
         
         T_Mean = (1-self.alpha) * T_Meanc + self.alpha * T_Meand
